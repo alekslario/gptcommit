@@ -1,0 +1,16 @@
+{
+  "name": "gptcommit",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ai": "doppler --project open-ai --config dev run -- node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "openai": "^3.2.1"
+  },
+  "description": ""
+}
