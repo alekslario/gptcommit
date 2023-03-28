@@ -1,18 +1,21 @@
 #!/usr/bin/env node
 import { execSync } from "child_process";
+import ask from "./ask.js";
 import { Configuration, OpenAIApi } from "openai";
+import ora from "ora";
+import chalk from "chalk";
+import stripAnsi from "strip-ansi";
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const ai = new OpenAIApi(configuration);
+const spinner = ora("Loading commits...🦄");
+const [_, __, arg1] = process.argv;
+const randomPick = arg1 === "random";
 
-const normalize = (str) => {
-  return str.replace(/feat: /g, "").trim();
-};
-
-let diff = execSync("git diff --cached").toString();
+let diff = execSync("git diff --cached -- ':!package-lock.json'").toString();
 if (!diff.trim()) {
-  throw new Error("No diff found");
+  throw new Error("No diff found (package-lock.json was excluded from diff))");
 }
 diff = diff
   .split("\n")
@@ -34,11 +37,37 @@ const getChatCompletion = async (messages = []) => {
     temperature: 0.5,
     n: 6,
   });
-  completion.data.choices.forEach((choice, index) => {
-    console.log(index, choice.message.content);
-  });
-  return completion.data.choices[0].message.content;
+
+  return completion.data.choices.map((choice, index) => choice.message.content);
 };
+spinner.start();
+console.log("\n");
 let res = await getChatCompletion();
-// res = normalize(res);
-// console.log(res);
+spinner.stop();
+let answer = "";
+if (!randomPick) {
+  const makeYourOwn = chalk.yellow("Make you own commit message");
+  answer = await ask([
+    {
+      type: "list",
+      name: "something",
+      message: chalk.red("Pick a commit message for this diff:"),
+      choices: [makeYourOwn, ...res.map((x) => chalk.green(x))],
+    },
+  ]);
+
+  if (answer === makeYourOwn) {
+    answer = await ask([
+      {
+        type: "input",
+        name: "something",
+        message: chalk.red("Enter your commit message:"),
+      },
+    ]);
+  }
+  answer = stripAnsi(answer);
+} else {
+  answer = res[Math.floor(Math.random() * res.length)];
+}
+console.log(chalk.green(`Commit message: ${answer}`));
+execSync(`git commit -m "${answer.replace(/"/g, '\\"')}"`);
