@@ -27,14 +27,18 @@ const getChatCompletion = async (messages = []) => {
     messages: [
       {
         role: "user",
-        content: `give me a commit message for this, using only a-z ${diff}`,
+        content: `give me a commit message for this (max 30 words) ${diff}`,
       },
     ],
     max_tokens: 1007,
-    temperature: 0.8,
+    temperature: 0.5,
+    n: 6,
+  });
+  completion.data.choices.forEach((choice, index) => {
+    console.log(index, choice.message.content);
   });
   return completion.data.choices[0].message.content;
 };
 let res = await getChatCompletion();
-res = normalize(res);
-console.log(res);
+// res = normalize(res);
+// console.log(res);
