@@ -69,5 +69,5 @@ if (!randomPick) {
 } else {
   answer = res[Math.floor(Math.random() * res.length)];
 }
-console.log(chalk.green(`Commit message: ${answer}`));
+
 execSync(`git commit -m "${answer.replace(/"/g, '\\"')}"`);
