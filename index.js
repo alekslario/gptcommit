@@ -13,6 +13,14 @@ const spinner = ora("Loading commits...🦄");
 const [_, __, arg1] = process.argv;
 const commands = process.argv.reduce((acc, x) => ({ ...acc, [x]: true }), {});
 const randomPick = commands["random"];
+
+//check if git is installed
+let status = execSync("git rev-parse --is-inside-work-tree").toString();
+if (status.trim() !== "true") {
+  console.log(chalk.yellow("No git in the directory."));
+  process.exit();
+}
+
 let diff = execSync("git diff --cached -- ':!package-lock.json'").toString();
 if (!diff.trim()) {
   console.log(
