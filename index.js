@@ -13,7 +13,6 @@ const spinner = ora("Loading commits...🦄");
 const [_, __, arg1] = process.argv;
 const commands = process.argv.reduce((acc, x) => ({ ...acc, [x]: true }), {});
 const randomPick = commands["random"];
-console.log(commands);
 let diff = execSync("git diff --cached -- ':!package-lock.json'").toString();
 if (!diff.trim()) {
   console.log(
