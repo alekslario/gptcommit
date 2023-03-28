@@ -11,11 +11,17 @@ const configuration = new Configuration({
 const ai = new OpenAIApi(configuration);
 const spinner = ora("Loading commits...🦄");
 const [_, __, arg1] = process.argv;
-const randomPick = arg1 === "random";
-
+const commands = process.argv.reduce((acc, x) => ({ ...acc, [x]: true }), {});
+const randomPick = commands["random"];
+console.log(commands);
 let diff = execSync("git diff --cached -- ':!package-lock.json'").toString();
 if (!diff.trim()) {
-  throw new Error("No diff found (package-lock.json was excluded from diff))");
+  console.log(
+    chalk.yellow(
+      "No diff found (package-lock.json was excluded from diff) or there is no git in the directory. Or something else..."
+    )
+  );
+  process.exit();
 }
 diff = diff
   .split("\n")
