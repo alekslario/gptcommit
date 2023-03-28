@@ -15,9 +15,12 @@ const commands = process.argv.reduce((acc, x) => ({ ...acc, [x]: true }), {});
 const randomPick = commands["random"];
 
 //check if git is installed
-let status = execSync("git rev-parse --is-inside-work-tree").toString();
-if (status.trim() !== "true") {
-  console.log(chalk.yellow("No git in the directory."));
+let status = "";
+try {
+  status = execSync("git rev-parse --is-inside-work-tree");
+} catch (error) {}
+if (status.toString().trim() !== "true") {
+  console.log("No git in the directory.");
   process.exit();
 }
 
