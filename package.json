@@ -1,0 +1,21 @@
+{
+  "name": "alekslario-gptcommit",
+  "version": "1.0.8",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "alekslario-gptcommit": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ai": "doppler --project open-ai --config dev run -- node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "inquirer": "^9.1.5",
+    "openai": "^3.2.1",
+    "ora": "^6.2.0"
+  },
+  "description": ""
+}
