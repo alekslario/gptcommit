@@ -25,7 +25,9 @@ mlog("path: " + path);
 //check if git is installed
 let status = "";
 try {
-  status = execSync("git rev-parse --is-inside-work-tree");
+  status = execSync(
+    `git --git-dir=${path}/.git rev-parse --is-inside-work-tree`
+  );
 } catch (error) {}
 if (status.toString().trim() !== "true") {
   console.log("No git in the directory.");
@@ -33,7 +35,8 @@ if (status.toString().trim() !== "true") {
   process.exit();
 }
 
-//check if there any large files
+//check if there any large files already added to git, generally not gonna happen ever
+//general directory size check run before this script and hence this is not needed, probably
 if (path) {
   let largeFiles = "";
   try {
@@ -50,21 +53,24 @@ if (path) {
     process.exit();
   }
 }
+//
 let diff = "";
 try {
-  diff = execSync("git diff --cached -- ':!package-lock.json'").toString();
-} catch (error) {
-  console.log(error);
-}
+  diff = execSync(
+    `git --git-dir=${path}/.git diff --cached -- ':!package-lock.json'`
+  ).toString();
+} catch (error) {}
 if (!diff.trim()) {
   mlog("No diff found (package-lock.json was excluded from diff)");
   console.log(
     chalk.yellow(
-      "No diff found (package-lock.json was excluded from diff) or there is no git in the directory. Or something else..."
+      "No diff found (package-lock.json was excluded from diff). Or something else..."
     )
   );
   process.exit();
 }
+console.log(diff);
+throw new Error("STOP1");
 diff = diff
   .split("\n")
   .map((x) => x.trim())
@@ -124,7 +130,7 @@ mlog(`Commit message: ${answer}`);
 
 try {
   const res2 = execSync(
-    `git commit -m "${answer.replace(/"/g, '\\"')}"`
+    `git commit ${path} -m "${answer.replace(/"/g, '\\"')}"`
   ).toString();
   mlog("res2: " + res2);
 } catch (error) {
