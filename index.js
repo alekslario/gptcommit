@@ -119,7 +119,7 @@ console.log(chalk.green(`Commit message: ${answer}`));
 
 answer = answer.replace(/"/g, '\\"');
 try {
-  execSync(`git commit ${path} -m "${answer}"`);
+  execSync(`cd ${path} && git commit -m "${answer} && git push"`);
 } catch (error) {
   console.log(error);
 }
