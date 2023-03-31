@@ -5,7 +5,6 @@ import { Configuration, OpenAIApi } from "openai";
 import ora from "ora";
 import chalk from "chalk";
 import stripAnsi from "strip-ansi";
-import { mlog } from "./log.js";
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -21,7 +20,6 @@ const commands = process.argv.reduce((acc, x) => {
 }, {});
 const randomPick = commands["random"];
 const path = commands["path"];
-mlog("path: " + path);
 //check if git is installed
 let status = "";
 try {
@@ -31,7 +29,6 @@ try {
 } catch (error) {}
 if (status.toString().trim() !== "true") {
   console.log("No git in the directory.");
-  mlog("No git in the directory.");
   process.exit();
 }
 
@@ -43,13 +40,11 @@ if (path) {
     largeFiles = execSync(`cd ${path} && bash /home/alex/check.size.sh`);
   } catch (error) {
     largeFiles = "stub";
-    mlog("error: " + error);
   }
   if (largeFiles.toString().trim().length !== 0) {
     console.log(
       chalk.yellow(`Found a large file over 30mb in ${path}...Aborting`)
     );
-    mlog(`Found a large file over 30mb in ${path}...Aborting`);
     process.exit();
   }
 }
@@ -61,7 +56,6 @@ try {
   ).toString();
 } catch (error) {}
 if (!diff.trim()) {
-  mlog("No diff found (package-lock.json was excluded from diff)");
   console.log(
     chalk.yellow(
       "No diff found (package-lock.json was excluded from diff). Or something else..."
@@ -69,8 +63,6 @@ if (!diff.trim()) {
   );
   process.exit();
 }
-console.log(diff);
-throw new Error("STOP1");
 diff = diff
   .split("\n")
   .map((x) => x.trim())
@@ -96,12 +88,10 @@ const getChatCompletion = async (messages = []) => {
 };
 spinner.start();
 console.log("\n");
-mlog("getting chat completion...");
 let res = await getChatCompletion();
 spinner.stop();
 let answer = "";
 if (!randomPick) {
-  mlog("not a random pick");
   const makeYourOwn = chalk.yellow("Make you own commit message");
   answer = await ask([
     {
@@ -126,13 +116,10 @@ if (!randomPick) {
   answer = res[Math.floor(Math.random() * res.length)];
 }
 console.log(chalk.green(`Commit message: ${answer}`));
-mlog(`Commit message: ${answer}`);
 
+answer = answer.replace(/"/g, '\\"');
 try {
-  const res2 = execSync(
-    `git commit ${path} -m "${answer.replace(/"/g, '\\"')}"`
-  ).toString();
-  mlog("res2: " + res2);
+  execSync(`git commit ${path} -m "${answer}"`);
 } catch (error) {
-  mlog("error while committing: " + error);
+  console.log(error);
 }
