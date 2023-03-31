@@ -22,9 +22,12 @@ const randomPick = commands["random"];
 const path = commands["path"];
 //check if git is installed
 let status = "";
+
 try {
   status = execSync(
-    `git --git-dir=${path}/.git rev-parse --is-inside-work-tree`
+    `git --git-dir=${
+      path || process.cwd()
+    }/.git rev-parse --is-inside-work-tree`
   );
 } catch (error) {}
 if (status.toString().trim() !== "true") {
@@ -37,13 +40,17 @@ if (status.toString().trim() !== "true") {
 if (path) {
   let largeFiles = "";
   try {
-    largeFiles = execSync(`cd ${path} && bash /home/alex/check.size.sh`);
+    largeFiles = execSync(
+      `cd ${path || process.cwd()} && bash /home/alex/check.size.sh`
+    );
   } catch (error) {
     largeFiles = "stub";
   }
   if (largeFiles.toString().trim().length !== 0) {
     console.log(
-      chalk.yellow(`Found a large file over 30mb in ${path}...Aborting`)
+      chalk.yellow(
+        `Found a large file over 30mb in ${path || process.cwd()}...Aborting`
+      )
     );
     process.exit();
   }
@@ -52,7 +59,9 @@ if (path) {
 let diff = "";
 try {
   diff = execSync(
-    `git --git-dir=${path}/.git diff --cached -- ':!package-lock.json'`
+    `git --git-dir=${
+      path || process.cwd()
+    }/.git diff --cached -- ':!package-lock.json'`
   ).toString();
 } catch (error) {}
 if (!diff.trim()) {
@@ -119,7 +128,9 @@ console.log(chalk.green(`Commit message: ${answer}`));
 
 answer = answer.replace(/"/g, '\\"');
 try {
-  execSync(`cd ${path} && git commit -m "${answer} && git push"`);
+  execSync(
+    `cd ${path || process.cwd()} && git commit -m "${answer} && git push"`
+  );
 } catch (error) {
   console.log(error);
 }
