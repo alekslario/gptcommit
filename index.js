@@ -127,6 +127,7 @@ if (!randomPick) {
 console.log(chalk.green(`Commit message: ${answer}`));
 
 answer = answer.replace(/"/g, '\\"');
+
 try {
   execSync(
     `cd ${path || process.cwd()} && git commit -m "${answer}" && git push`
