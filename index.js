@@ -61,7 +61,7 @@ try {
   diff = execSync(
     `git --git-dir=${
       path || process.cwd()
-    }/.git diff --cached -- ':!package-lock.json'`
+    }/.git diff --cached -- ':!*-lock.json'`
   ).toString();
 } catch (error) {}
 if (!diff.trim()) {
