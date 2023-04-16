@@ -61,7 +61,7 @@ try {
   diff = execSync(
     `git --git-dir=${
       path || process.cwd()
-    }/.git diff --cached -- ':!*-lock.json'`
+    }/.git diff --cached -- ':!*-lock.json' ':!*.lock'`
   ).toString();
 } catch (error) {}
 if (!diff.trim()) {
@@ -129,9 +129,13 @@ console.log(chalk.green(`Commit message: ${answer}`));
 answer = answer.replace(/"/g, '\\"');
 
 try {
-  execSync(
-    `cd ${path || process.cwd()} && git commit -m "${answer}" && git push`
-  );
+  execSync(`cd ${path || process.cwd()} && git commit -m "${answer}"`);
+} catch (error) {
+  console.log(error);
+}
+
+try {
+  execSync(`cd ${path || process.cwd()} && git push`);
 } catch (error) {
   console.log(error);
 }

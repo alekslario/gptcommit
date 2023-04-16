@@ -1,6 +1,6 @@
 {
   "name": "alekslario-gptcommit",
-  "version": "1.0.19",
+  "version": "1.0.21",
   "main": "index.js",
   "type": "module",
   "bin": {
