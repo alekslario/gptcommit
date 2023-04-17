@@ -133,9 +133,3 @@ try {
 } catch (error) {
   console.log(error);
 }
-
-try {
-  execSync(`cd ${path || process.cwd()} && git push`);
-} catch (error) {
-  console.log(error);
-}
